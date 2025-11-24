@@ -19,7 +19,7 @@ def fill_dropdown(driver, question_number, text):
     # driver.find_element(By.XPATH, f"//div[@role='option']//span[text()='{text}']").click()
     
     # klik dropdown Nama
-    dropdown = driver.find_element(By.XPATH, "div[@role='button' and @aria-haspopup='listbox']")
+    dropdown = driver.find_element(By.XPATH, "//div[@role='button' and @aria-haspopup='listbox']")
     dropdown.click()
     time.sleep(1)  # tunggu opsi muncul
 
