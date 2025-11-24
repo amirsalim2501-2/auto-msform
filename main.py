@@ -55,9 +55,9 @@ def fill_answers(driver):
     # =================
     # FIELD 2: Choose one (In/Out)
     # =================
-    if hour == 8:
+    if hour == 10:
         choose_one = "In"
-    else:
+    else if hour == 11:
         choose_one = "Out"
 
     select_radio(driver, choose_one)
