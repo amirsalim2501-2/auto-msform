@@ -1,7 +1,3 @@
-# ==========================================================
-# AUTOMASI PENGISIAN MICROSOFT FORM (SESUAIKAN DENGAN FORM KAMU)
-# ==========================================================
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -14,132 +10,83 @@ from email.mime.text import MIMEText
 import requests
 import os
 
-
-# ==========================================================
-# === GANTI DENGAN LINK FORM KAMU ==========================
-# ==========================================================
-FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=HsTJsIjXVEOtfFIw_igOHbLbLDXy-79Ft9IFo9pI4bNUQkNCWktLQ1VWMFdEM0tTWTUyVVFSWjVYVy4u"  # <-- WAJIB GANTI
-
-
-# ==========================================================
-# === FUNGSI PENGISIAN FORM ================================
-# ==========================================================
+FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=HsTJsIjXVEOtfFIw_igOHbLbLDXy-79Ft9IFo9pI4bNUQkNCWktLQ1VWMFdEM0tTWTUyVVFSWjVYVy4u"  # link form kamu
 
 def fill_dropdown(driver, question_number, text):
-    """Select dropdown by visible text."""
-    dropdown = driver.find_element(By.XPATH, f"(//div[contains(@class,'office-form-question-choice-container')]//i[contains(@class,'ms-Icon--ChevronDown')])[{question_number}]")
+    dropdown = driver.find_element(By.XPATH, f"(//button[@role='combobox'])[{question_number}]")
     dropdown.click()
     time.sleep(1)
-    driver.find_element(By.XPATH, f"//span[text()='{text}']").click()
-
+    driver.find_element(By.XPATH, f"//div[@role='option']//span[text()='{text}']").click()
 
 def select_radio(driver, text):
-    """Click radio button by label text."""
-    driver.find_element(By.XPATH, f"//div[@role='radio']//span[text()='{text}']").click()
-
-
-# ==========================================================
-# === LOGIKA JAWABAN SESUAI HARI DAN JAM ===================
-# ==========================================================
+    driver.find_element(By.XPATH, f"//label[contains(@class,'office-form-question-choice-label')]//span[text()='{text}']").click()
 
 def fill_answers(driver):
     now = datetime.datetime.utcnow() + datetime.timedelta(hours=7)  # WIB
-    weekday = now.weekday()  # 0=Mon, 4=Fri
-    hour = now.hour          # 8 pagi atau 17 sore
+    weekday = now.weekday()  # 0=Senin, …, 4=Jumat
+    hour = now.hour
 
-    # =================
-    # FIELD 1: Nama
-    # =================
+    # Nama (dropdown) — asumsikan pertanyaan “Nama” adalah dropdown nomor 1
     fill_dropdown(driver, 1, "A")
 
-    # =================
-    # FIELD 2: Choose one (In/Out)
-    # =================
-    if hour == 10:
+    # Choose one → In / Out
+    if hour == 8:
         choose_one = "In"
-    elif hour == 11:
+    else:
         choose_one = "Out"
-
     select_radio(driver, choose_one)
 
-    # =================
-    # FIELD 3: Work (WFO/WFH)
-    # =================
+    # Work → WFO / WFH
     if weekday in [0,1,2]:  # Senin–Rabu
         work = "WFO"
-    else:
+    else:  # Kamis–Jumat
         work = "WFH"
-
     select_radio(driver, work)
 
-
-
-# ==========================================================
-# === NOTIF EMAIL ==========================================
-# ==========================================================
-EMAIL_SENDER = os.getenv("EMAIL_USER")
-EMAIL_PASS = os.getenv("EMAIL_PASS")
-EMAIL_TARGET = "amirsalim2501@gmail.com"   # <-- GANTI EMAIL TUJUAN
-
 def send_email_notif():
-    msg = MIMEText("Microsoft Form berhasil diisi otomatis.")
-    msg["Subject"] = "Automasi Berhasil"
+    EMAIL_SENDER = os.getenv("EMAIL_USER")
+    EMAIL_PASS = os.getenv("EMAIL_PASS")
+    EMAIL_TARGET = "emailtujuan@gmail.com"  # GANTI
+    msg = MIMEText("Form Microsoft telah terisi otomatis.")
+    msg["Subject"] = "Notifikasi Automasi Form"
     msg["From"] = EMAIL_SENDER
     msg["To"] = EMAIL_TARGET
 
-    smtp = smtplib.SMTP_SSL("smtp.gmail.com", 465)
-    smtp.login(EMAIL_SENDER, EMAIL_PASS)
-    smtp.send_message(msg)
-    smtp.quit()
-
-
-
-# ==========================================================
-# === NOTIF WHATSAPP =======================================
-# ==========================================================
-FONNTE_TOKEN = os.getenv("FONNTE_TOKEN")
-WA_TARGET = "6281388340805"    # <-- GANTI NOMOR WA
+    s = smtplib.SMTP_SSL("smtp.gmail.com", 465)
+    s.login(EMAIL_SENDER, EMAIL_PASS)
+    s.send_message(msg)
+    s.quit()
 
 def send_wa_notif():
+    FONNTE_TOKEN = os.getenv("FONNTE_TOKEN")
+    WA_TARGET = "628xxxxxxxxxx"  # ganti nomor WA
     if not FONNTE_TOKEN:
         return
     headers = {"Authorization": FONNTE_TOKEN}
-    data = {
-        "target": WA_TARGET,
-        "message": "Microsoft Form berhasil diisi otomatis.",
-    }
+    data = {"target": WA_TARGET, "message": "Form berhasil diisi otomatis."}
     requests.post("https://api.fonnte.com/send", headers=headers, data=data)
 
-
-
-# ==========================================================
-# === MAIN PROCESS =========================================
-# ==========================================================
 def fill_form():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
-                              options=chrome_options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     driver.get(FORM_URL)
     time.sleep(3)
 
     fill_answers(driver)
 
-    # Klik submit
+    # klik tombol Submit / Kirim
     driver.find_element(By.XPATH, "//button[contains(.,'Submit') or contains(.,'Kirim')]").click()
     time.sleep(2)
-
     driver.quit()
 
-    # Notifikasi
     send_email_notif()
     send_wa_notif()
 
-
+    print("Form berhasil diisi otomatis pada", datetime.datetime.now())
 
 if __name__ == "__main__":
     fill_form()
