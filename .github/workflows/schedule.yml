@@ -1,0 +1,28 @@
+name: Auto Microsoft Form
+
+on:
+  schedule:
+    - cron: "0 1 * * 1-5"   # 08:00 WIB
+    - cron: "0 10 * * 1-5"  # 17:00 WIB
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run automation
+        env:
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+          FONNTE_TOKEN: ${{ secrets.FONNTE_TOKEN }}
+        run: python main.py
