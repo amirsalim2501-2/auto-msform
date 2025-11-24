@@ -57,7 +57,7 @@ def fill_answers(driver):
     # =================
     if hour == 10:
         choose_one = "In"
-    else if hour == 11:
+    elif hour == 11:
         choose_one = "Out"
 
     select_radio(driver, choose_one)
@@ -77,8 +77,8 @@ def fill_answers(driver):
 # ==========================================================
 # === NOTIF EMAIL ==========================================
 # ==========================================================
-EMAIL_SENDER = os.getenv("i_amir@agate.id")
-EMAIL_PASS = os.getenv("Suplexcity123")
+EMAIL_SENDER = os.getenv("EMAIL_USER")
+EMAIL_PASS = os.getenv("EMAIL_PASS")
 EMAIL_TARGET = "amirsalim2501@gmail.com"   # <-- GANTI EMAIL TUJUAN
 
 def send_email_notif():
