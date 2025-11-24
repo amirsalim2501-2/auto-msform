@@ -13,10 +13,15 @@ import os
 FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=HsTJsIjXVEOtfFIw_igOHbLbLDXy-79Ft9IFo9pI4bNUQkNCWktLQ1VWMFdEM0tTWTUyVVFSWjVYVy4u"  # link form kamu
 
 def fill_dropdown(driver, question_number, text):
-    dropdown = driver.find_element(By.XPATH, f"(//button[@role='combobox'])[{question_number}]")
+    # dropdown = driver.find_element(By.XPATH, f"(//button[@role='combobox'])[{question_number}]")
+    # dropdown.click()
+    # time.sleep(1)
+    # driver.find_element(By.XPATH, f"//div[@role='option']//span[text()='{text}']").click()
+    
+    # klik dropdown Nama
+    dropdown = driver.find_element(By.XPATH, "//div[@role='button' and @aria-haspopup='listbox']")
     dropdown.click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, f"//div[@role='option']//span[text()='{text}']").click()
+    time.sleep(1)  # tunggu opsi muncul
 
 def select_radio(driver, text):
     driver.find_element(By.XPATH, f"//label[contains(@class,'office-form-question-choice-label')]//span[text()='{text}']").click()
@@ -34,14 +39,14 @@ def fill_answers(driver):
         choose_one = "In"
     else:
         choose_one = "Out"
-    select_radio(driver, choose_one)
+    # select_radio(driver, choose_one)
 
     # Work → WFO / WFH
     if weekday in [0,1,2]:  # Senin–Rabu
         work = "WFO"
     else:  # Kamis–Jumat
         work = "WFH"
-    select_radio(driver, work)
+    # select_radio(driver, work)
 
 def send_email_notif():
     EMAIL_SENDER = os.getenv("EMAIL_USER")
