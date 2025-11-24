@@ -88,16 +88,16 @@ def fill_form():
 
     # --- ISI NAMA (dropdown) ---
     # Placeholder awal biasanya huruf default misal "B"
-    select_dropdown(driver, placeholder_text="B", select_value=nama)
+    # select_dropdown(driver, placeholder_text="B", select_value=nama)
 
     # --- CHOOSE (radio) ---
-    select_radio(driver, choose)
+    # select_radio(driver, choose)
 
     # --- WORK (radio) ---
-    select_radio(driver, work)
+    # select_radio(driver, work)
 
     # --- SUBMIT ---
-    submit = driver.find_element(By.XPATH, "//button[@type='submit' or @aria-label='Submit']")
+    submit = driver.find_element(By.XPATH, "//button[@data-automation-id='submitButton']")
     submit.click()
     time.sleep(3)
 
